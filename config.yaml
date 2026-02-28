@@ -1,0 +1,94 @@
+system:
+  environment: "development"
+  log_level: "INFO"
+  api_port: 8000
+  metrics_port: 9090
+
+models:
+  default_drift_threshold: 0.15
+  drift_check_interval_seconds: 3600
+  max_concurrent_retraining_jobs: 5
+  retraining_deduplication_window_hours: 6
+
+data_validation:
+  default_quality_threshold: 0.95
+  validation_timeout_ms: 500
+  max_dataset_rows: 10000
+
+deployment:
+  canary:
+    initial_traffic_percentage: 5
+    observation_period_minutes: 30
+    traffic_increment_percentage: 25
+    max_rollout_hours: 4
+    error_rate_threshold: 0.05
+    latency_threshold_multiplier: 1.5
+  
+  kubernetes:
+    namespace: "mlops-dev"
+    service_account: "mlops-deployer"
+    image_pull_policy: "IfNotPresent"
+
+alerting:
+  slack:
+    enabled: false
+    webhook_url: ""
+    default_channel: "#mlops-alerts"
+    rate_limit_per_model_per_hour: 10
+  
+  webhooks:
+    enabled: false
+    endpoints: []
+
+storage:
+  s3:
+    bucket_prefix: "mlops-control-plane"
+    model_artifacts_bucket: ""
+    lineage_data_bucket: ""
+    audit_logs_bucket: ""
+    backup_bucket: ""
+    region: "us-east-1"
+
+database:
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "mlops_control_plane"
+    username: "mlops"
+    password: "mlops_dev_password"
+    pool_size: 20
+    max_overflow: 10
+
+monitoring:
+  prometheus:
+    scrape_interval_seconds: 30
+    retention_days: 30
+  
+  health_check:
+    interval_seconds: 60
+    timeout_seconds: 10
+    unhealthy_threshold_minutes: 5
+
+airflow:
+  base_url: ""
+  username: ""
+  password: ""
+  retraining_dag_id: "model_retraining_workflow"
+
+aws:
+  region: "us-east-1"
+  training_state_machine_arn: ""
+
+security:
+  api_keys:
+    - key: "dev-api-key-12345"
+      role: "admin"
+  cors_enabled: true
+  allowed_origins:
+    - "http://localhost:3000"
+
+disaster_recovery:
+  backup_enabled: true
+  backup_schedule_cron: "0 2 * * *"
+  retention_days: 30
+  verification_schedule_cron: "0 3 * * 0"
